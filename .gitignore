@@ -1,5 +1,6 @@
 .DS_Store
 .env
+tmp
 
 # terraform
 terraform.tfstate.d/
