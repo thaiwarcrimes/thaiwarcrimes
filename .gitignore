@@ -1,0 +1,9 @@
+.DS_Store
+.env
+tmp
+
+# terraform
+terraform.tfstate.d/
+.terraform
+terraform.tfstate
+terraform.tfstate.*
