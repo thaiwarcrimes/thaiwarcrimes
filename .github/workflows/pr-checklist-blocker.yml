@@ -1,0 +1,59 @@
+name: PR Checklist Blocker
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  checklist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if required PR checkboxes are not checked
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body || "";
+
+            // Put the exact checkbox lines you want to require here.
+            const required = [
+              "- [x] I confirm this PR does **not** include copyrighted media re-uploads (images/videos) unless we own rights or have explicit permission.",
+              "- [x] I included **source links** for any facts/claims added (minimum 1 credible source per claim).",
+              "- [x] I verified content is **neutral** (no slurs/harassment/incitement).",
+              "- [x] I added/updated validation (schema/tests) if content/config changes.",
+              "- [x] I updated docs/notes if behavior changed."
+            ];
+
+            // Also require these sections to be non-empty in the PR body:
+            const requiredSections = [
+              { label: "What changed?", regex: /\*\*What changed\?\*\*[\s\S]*?(?=\n\*\*Why\?\*\*|\n\*\*Evidence \/ Sources\*\*|$)/i },
+              { label: "Why?", regex: /\*\*Why\?\*\*[\s\S]*?(?=\n\*\*Evidence \/ Sources\*\*|$)/i },
+              { label: "Evidence / Sources", regex: /\*\*Evidence\s*\/\s*Sources\*\*[\s\S]*$/i },
+            ];
+
+            const missing = [];
+
+            for (const item of required) {
+              if (!body.includes(item)) missing.push(`Unchecked: ${item.replace("- [x] ", "")}`);
+            }
+
+            for (const s of requiredSections) {
+              const m = body.match(s.regex);
+              const content = (m?.[0] || "")
+                .replace(/\*\*[^*]+\*\*/g, "")  // strip headings
+                .trim();
+              // treat empty if only comments/whitespace
+              if (!content || content.length < 10) missing.push(`Missing/empty section: ${s.label}`);
+            }
+
+            if (missing.length) {
+              core.setFailed(
+                "PR requirements not met:\n" +
+                missing.map(x => `- ${x}`).join("\n") +
+                "\n\nFix: check all required boxes and fill required sections in the PR description."
+              );
+            } else {
+              core.info("All required boxes are checked and required sections look filled.");
+            }

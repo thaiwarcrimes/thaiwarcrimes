@@ -1,0 +1,121 @@
+name: PR Risky Content Gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - "src/content/**"
+      - "content/**"
+      - "docs/**"
+      - ".github/**"
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  risky_pr_gate:
+    name: Risky PR checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: List changed files
+        id: changed
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            src/content/**
+            content/**
+            docs/**
+
+      - name: Block disallowed file types (re-hosting media)
+        run: |
+          set -euo pipefail
+          echo "${{ steps.changed.outputs.all_changed_files }}" | tr ' ' '\n' > /tmp/changed.txt
+
+          # Block common re-hosting formats in PR content areas
+          DISALLOWED_REGEX='\.(png|jpg|jpeg|gif|webp|mp4|mov|avi|mp3|wav|pdf)$'
+
+          bad=$(grep -E "${DISALLOWED_REGEX}" /tmp/changed.txt || true)
+
+          if [ -n "$bad" ]; then
+            echo "::error::Disallowed binary/media files detected in PR (possible re-hosting). Use links/embeds instead."
+            echo "$bad"
+            exit 1
+          fi
+
+      - name: Scan for risky patterns in text (copy/paste, missing attribution markers)
+        run: |
+          set -euo pipefail
+          echo "${{ steps.changed.outputs.all_changed_files }}" | tr ' ' '\n' > /tmp/changed.txt
+
+          # Only scan text-like files
+          files=$(grep -E '\.(md|mdx|yaml|yml|json|txt)$' /tmp/changed.txt || true)
+          if [ -z "$files" ]; then
+            echo "No text files to scan."
+            exit 0
+          fi
+
+          fail=0
+          for f in $files; do
+            [ -f "$f" ] || continue
+
+            # 1) Flag very long paragraphs (often indicates copy/paste)
+            #    Adjust thresholds as you like.
+            if awk 'length($0) > 600 {exit 0} END {exit 1}' "$f"; then
+              echo "::error file=$f::Found a line > 600 chars (likely large paste). Rewrite in original words, keep short quotes only."
+              fail=1
+            fi
+
+            # 2) Require some source attribution marker if file is an event/story file
+            #    (Customize path rules to match your Astro structure.)
+            if echo "$f" | grep -Eq '^src/content/(events|stories)/|^content/(events|stories)/'; then
+              if ! grep -Eq '(^|\s)(source_url|sources|evidence|attribution)\s*:' "$f"; then
+                echo "::error file=$f::Missing attribution fields (e.g., source_url / sources / evidence)."
+                fail=1
+              fi
+            fi
+
+            # 3) Flag “downloaded media” hints (contributors sometimes admit it)
+            if grep -Eqi '(downloaded from|reuploaded|mirror of|copied from|ripped from)' "$f"; then
+              echo "::error file=$f::Text suggests re-hosting/copying media. The project should link/embeds instead of reupload."
+              fail=1
+            fi
+
+            # 4) Flag “verbatim” / “full transcript” intent
+            if grep -Eqi '(full transcript|verbatim|entire article|full article|complete text)' "$f"; then
+              echo "::error file=$f::Text suggests full reproduction. Only summarize; keep quotes minimal."
+              fail=1
+            fi
+          done
+
+          if [ "$fail" -eq 1 ]; then
+            exit 1
+          fi
+
+      - name: Require PR template checklist ticked (optional but recommended)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const body = (pr.body || "").toLowerCase();
+
+            // Require contributors to confirm basic compliance in PR description.
+            const required = [
+              "i wrote this in my own words",
+              "i included source links",
+              "i did not rehost images/videos",
+              "no long quotes"
+            ];
+
+            const missing = required.filter(x => !body.includes(x));
+            if (missing.length) {
+              core.setFailed(
+                "PR description missing required compliance confirmations:\n- " + missing.join("\n- ")
+              );
+            }

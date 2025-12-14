@@ -1,0 +1,90 @@
+name: Overview Required Fields Gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - "docs/civicshield-overview.yml"
+      - "docs/OVERVIEW.md"
+
+permissions:
+  contents: read
+
+jobs:
+  overview_gate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate overview required fields (YAML)
+        if: ${{ hashFiles('docs/civicshield-overview.yml') != '' }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import sys, re
+          from pathlib import Path
+
+          path = Path("docs/civicshield-overview.yml")
+          data = path.read_text(encoding="utf-8")
+
+          required_keys = [
+            "project_name",
+            "mission",
+            "scope",
+            "content_model",
+            "moderation",
+            "legal_safety",
+          ]
+
+          missing = [k for k in required_keys if not re.search(rf"(?m)^{re.escape(k)}\s*:", data)]
+          if missing:
+            print(f"Missing required fields in {path}: {', '.join(missing)}")
+            sys.exit(1)
+
+          # Require these booleans under legal_safety
+          must_have = [
+            "no_rehosting_media: true",
+            "sources_required: true",
+          ]
+          lower = data.lower()
+          for line in must_have:
+            if line not in lower:
+              print(f"Missing or not set to true: {line} (under legal_safety)")
+              sys.exit(1)
+
+          print("Overview YAML looks good.")
+          PY
+
+      - name: Validate overview required headings (Markdown fallback)
+        if: ${{ hashFiles('docs/OVERVIEW.md') != '' }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+
+          path = Path("docs/OVERVIEW.md")
+          txt = path.read_text(encoding="utf-8").lower()
+
+          required_headings = [
+            "# civicshield",
+            "## mission",
+            "## scope",
+            "## content model",
+            "## moderation",
+            "## legal & safety",
+          ]
+
+          missing = [h for h in required_headings if h not in txt]
+          if missing:
+            print(f"Missing required headings in {path}: {missing}")
+            sys.exit(1)
+
+          # Require explicit "no rehosting" statement
+          if "no rehosting" not in txt and "do not rehost" not in txt:
+            print("Missing explicit no-rehosting policy in Overview.md (Legal & Safety section).")
+            sys.exit(1)
+
+          print("Overview Markdown looks good.")
+          PY

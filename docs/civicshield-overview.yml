@@ -1,0 +1,15 @@
+project_name: Thaiwarcrimes
+mission: "Free public crisis timeline with evidence-first moderation."
+scope:
+  - crises
+  - aggression
+  - war
+content_model: "chronological timeline (optionally geo-based)"
+moderation: "PR-based, human-reviewed"
+legal_safety:
+  no_rehosting_media: true
+  sources_required: true
+contact:
+  email: "contact@yourdomain.tld"
+repo:
+  content_path: "src/content/events"
