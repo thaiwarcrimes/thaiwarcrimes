@@ -1,0 +1,138 @@
+---
+import type { CollectionEntry } from "astro:content";
+import TimelineCard from "./TimelineCard.astro";
+
+interface Props {
+  events: CollectionEntry<"events">[];
+}
+
+const { events } = Astro.props;
+
+// Sort events by date (newest first)
+const sortedEvents = events.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+---
+
+<section class="timeline-section">
+  <div class="container">
+    <header class="timeline-header">
+      <p class="timeline-subtitle">Timeline</p>
+      <h1 class="timeline-title">Documented Events</h1>
+      <p class="timeline-description">
+        A chronological documentation of alleged war crimes and human rights
+        abuses related to the Thailand-Cambodia conflict. Click on any event to
+        view more details.
+      </p>
+    </header>
+
+    <div class="timeline" id="timeline">
+      {
+        sortedEvents.map((event, index) => (
+          <TimelineCard event={event} index={index} />
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script src="./timeline.ts"></script>
+
+<style>
+  .timeline-section {
+    padding: var(--space-12) 0 var(--space-24);
+  }
+
+  .timeline-header {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto var(--space-20);
+  }
+
+  .timeline-subtitle {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-3);
+  }
+
+  .timeline-title {
+    font-size: var(--text-5xl);
+    font-weight: 800;
+    margin-bottom: var(--space-6);
+    color: var(--color-text-primary);
+  }
+
+  .timeline-description {
+    font-size: var(--text-lg);
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .timeline {
+    position: relative;
+    padding: var(--space-8) 0;
+  }
+
+  /* Continuous vertical line with gradient */
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      var(--color-accent) 5%,
+      var(--color-accent) 95%,
+      transparent 100%
+    );
+    transform: translateX(-50%);
+    opacity: 0.3;
+  }
+
+  /* Add subtle shadow to the line for depth */
+  .timeline::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(217, 119, 6, 0.15) 5%,
+      rgba(217, 119, 6, 0.15) 95%,
+      transparent 100%
+    );
+    transform: translateX(calc(-50% + 1px));
+    filter: blur(2px);
+  }
+
+  @media (max-width: 900px) {
+    .timeline::before {
+      left: 25px;
+    }
+
+    .timeline::after {
+      left: 25px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .timeline-title {
+      font-size: var(--text-3xl);
+    }
+
+    .timeline-description {
+      font-size: var(--text-base);
+    }
+  }
+</style>

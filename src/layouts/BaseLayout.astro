@@ -1,0 +1,247 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+}
+
+const {
+  title = 'Thailand-Cambodia Conflict Documentation',
+  description = 'Compiling evidence and documentation of alleged war crimes and serious human rights abuses related to the Thailand-Cambodia conflict, supporting transparency, historical record-keeping, and accountability efforts.',
+  image = '/images/og-image.jpg',
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Primary Meta Tags -->
+    <title>{title}</title>
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(image, Astro.site)} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={new URL(image, Astro.site)} />
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link visually-hidden">Skip to main content</a>
+
+    <header class="site-header">
+      <div class="container">
+        <nav class="site-nav">
+          <a href="/" class="site-logo">
+            <span class="site-title">Thailand-Cambodia Conflict</span>
+            <span class="site-subtitle">Documentation Archive</span>
+          </a>
+          <ul class="nav-menu">
+            <li><a href="/">Timeline</a></li>
+            <li><a href="/about">About</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content" class="site-main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3 class="footer-title">Purpose</h3>
+            <p class="footer-text">
+              This website documents alleged war crimes and human rights abuses
+              related to the Thailand-Cambodia conflict for transparency,
+              historical record-keeping, and accountability.
+            </p>
+          </div>
+
+          <div class="footer-section">
+            <h3 class="footer-title">Disclaimer</h3>
+            <p class="footer-text">
+              Information presented here is based on available sources and reports.
+              Events marked as "alleged" are unverified claims. We strive for accuracy
+              and welcome corrections.
+            </p>
+          </div>
+
+          <div class="footer-section">
+            <h3 class="footer-title">Contact</h3>
+            <p class="footer-text">
+              For corrections, additional sources, or inquiries:<br />
+              <a href="mailto:contact@thaiwarcrimes.org">contact@thaiwarcrimes.org</a>
+            </p>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>&copy; {new Date().getFullYear()} Thailand-Cambodia Conflict Documentation. All rights reserved.</p>
+          <p class="footer-note">
+            Built for transparency and historical accountability.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <style>
+      .skip-link:focus {
+        position: fixed;
+        top: var(--space-4);
+        left: var(--space-4);
+        z-index: 9999;
+        padding: var(--space-3) var(--space-6);
+        background: var(--color-accent);
+        color: white;
+        font-weight: 600;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .site-header {
+        background: var(--color-surface);
+        border-bottom: 1px solid var(--color-border);
+        padding: var(--space-6) 0;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+      }
+
+      .site-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .site-logo {
+        display: flex;
+        flex-direction: column;
+        text-decoration: none;
+        color: var(--color-text-primary);
+      }
+
+      .site-title {
+        font-size: var(--text-xl);
+        font-weight: 700;
+        line-height: 1.2;
+      }
+
+      .site-subtitle {
+        font-size: var(--text-sm);
+        color: var(--color-text-secondary);
+        font-weight: 500;
+      }
+
+      .nav-menu {
+        display: flex;
+        gap: var(--space-6);
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .nav-menu a {
+        font-weight: 500;
+        color: var(--color-text-secondary);
+        transition: color var(--transition-fast);
+      }
+
+      .nav-menu a:hover {
+        color: var(--color-accent);
+        text-decoration: none;
+      }
+
+      .site-main {
+        min-height: 60vh;
+      }
+
+      .site-footer {
+        background: var(--color-neutral-900);
+        color: var(--color-neutral-300);
+        padding: var(--space-16) 0 var(--space-8);
+        margin-top: var(--space-24);
+      }
+
+      .footer-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: var(--space-10);
+        margin-bottom: var(--space-12);
+      }
+
+      .footer-title {
+        font-size: var(--text-lg);
+        color: var(--color-neutral-100);
+        margin-bottom: var(--space-4);
+      }
+
+      .footer-text {
+        font-size: var(--text-sm);
+        line-height: 1.6;
+        margin: 0;
+      }
+
+      .footer-text a {
+        color: var(--color-accent-300);
+      }
+
+      .footer-text a:hover {
+        color: var(--color-accent-200);
+      }
+
+      .footer-bottom {
+        border-top: 1px solid var(--color-neutral-800);
+        padding-top: var(--space-6);
+        text-align: center;
+        font-size: var(--text-sm);
+        color: var(--color-neutral-500);
+      }
+
+      .footer-note {
+        margin-top: var(--space-2);
+        font-size: var(--text-xs);
+      }
+
+      @media (max-width: 768px) {
+        .site-nav {
+          flex-direction: column;
+          gap: var(--space-4);
+          text-align: center;
+        }
+
+        .nav-menu {
+          gap: var(--space-4);
+        }
+
+        .footer-content {
+          grid-template-columns: 1fr;
+          gap: var(--space-8);
+        }
+      }
+    </style>
+  </body>
+</html>
+

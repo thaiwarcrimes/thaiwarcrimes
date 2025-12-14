@@ -1,0 +1,76 @@
+---
+interface Props {
+  type?: 'info' | 'warning' | 'danger' | 'success';
+  title?: string;
+}
+
+const { type = 'info', title } = Astro.props;
+---
+
+<aside class={`callout callout-${type}`}>
+  {title && <p class="callout-title">{title}</p>}
+  <div class="callout-content">
+    <slot />
+  </div>
+</aside>
+
+<style>
+  .callout {
+    margin: var(--space-8) 0;
+    padding: var(--space-6);
+    border-radius: var(--border-radius);
+    border-left: 4px solid;
+  }
+
+  .callout-title {
+    font-weight: 700;
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-3);
+  }
+
+  .callout-content {
+    font-size: var(--text-base);
+    line-height: 1.6;
+  }
+
+  .callout-content :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .callout-info {
+    background: rgba(37, 99, 235, 0.1);
+    border-color: #2563eb;
+  }
+
+  .callout-info .callout-title {
+    color: #1e40af;
+  }
+
+  .callout-warning {
+    background: rgba(251, 191, 36, 0.1);
+    border-color: var(--color-accent-500);
+  }
+
+  .callout-warning .callout-title {
+    color: var(--color-accent-700);
+  }
+
+  .callout-danger {
+    background: rgba(220, 38, 38, 0.1);
+    border-color: #dc2626;
+  }
+
+  .callout-danger .callout-title {
+    color: #991b1b;
+  }
+
+  .callout-success {
+    background: rgba(22, 163, 74, 0.1);
+    border-color: #16a34a;
+  }
+
+  .callout-success .callout-title {
+    color: #15803d;
+  }
+</style>
+

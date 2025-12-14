@@ -1,0 +1,87 @@
+---
+interface Props {
+  author?: string;
+  role?: string;
+  source?: string;
+}
+
+const { author, role, source } = Astro.props;
+---
+
+<blockquote class="quote">
+  <div class="quote-content">
+    <slot />
+  </div>
+  {(author || role || source) && (
+    <footer class="quote-footer">
+      {author && <cite class="quote-author">{author}</cite>}
+      {role && <span class="quote-role">{role}</span>}
+      {source && <span class="quote-source">{source}</span>}
+    </footer>
+  )}
+</blockquote>
+
+<style>
+  .quote {
+    margin: var(--space-10) 0;
+    padding: var(--space-8);
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    border-left: 6px solid var(--color-accent);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow);
+  }
+
+  .quote-content {
+    font-size: var(--text-lg);
+    line-height: 1.7;
+    color: var(--color-text-primary);
+    font-style: italic;
+  }
+
+  .quote-content :global(p:first-child::before) {
+    content: '"';
+    font-size: 2em;
+    line-height: 0;
+    vertical-align: -0.4em;
+    margin-right: 0.1em;
+    color: var(--color-accent);
+  }
+
+  .quote-content :global(p:last-child::after) {
+    content: '"';
+    font-size: 2em;
+    line-height: 0;
+    vertical-align: -0.4em;
+    margin-left: 0.1em;
+    color: var(--color-accent);
+  }
+
+  .quote-footer {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .quote-author {
+    font-weight: 600;
+    font-style: normal;
+    color: var(--color-text-primary);
+    font-size: var(--text-base);
+  }
+
+  .quote-role {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .quote-source {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    font-style: italic;
+  }
+</style>
+

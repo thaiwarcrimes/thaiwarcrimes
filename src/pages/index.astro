@@ -1,0 +1,11 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Timeline from '../components/timeline/Timeline.astro';
+
+const events = await getCollection('events');
+---
+
+<BaseLayout>
+  <Timeline events={events} />
+</BaseLayout>
