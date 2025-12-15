@@ -90,14 +90,24 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
           <div class="footer-section">
             <h3 class="footer-title">Contact</h3>
             <p class="footer-text">
-              For corrections, additional sources, or inquiries:<br />
-              <a href="mailto:contact@thaiwarcrimes.org">contact@thaiwarcrimes.org</a>
+              For corrections, additional sources, or inquiries, please see:
+              <a href="https://github.com/thaiwarcrimes/thaiwarcrimes"
+                target="_blank"
+                rel="noopener noreferrer">
+                the thaiwarcrimes/thaiwarcrimes GitHub repository.
+              </a>
             </p>
           </div>
         </div>
 
         <div class="footer-bottom">
-          <p>&copy; {new Date().getFullYear()} Thailand-Cambodia Conflict Documentation. All rights reserved.</p>
+          <p>
+            &copy; {new Date().getFullYear()} Thailand-Cambodia Conflict Documentation.
+            Except where otherwise noted, content on this website is licensed under a
+            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="license noopener noreferrer">
+              Creative Commons Attribution 4.0 International License (CC BY 4.0)
+            </a>.
+          </p>
           <p class="footer-note">
             Built for transparency and historical accountability.
           </p>
@@ -244,4 +254,3 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     </style>
   </body>
 </html>
-
