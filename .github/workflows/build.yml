@@ -35,7 +35,7 @@ jobs:
 
     steps:
       - name: Download Documentation Source
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: website
           path: website
